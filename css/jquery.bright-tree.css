@@ -1,0 +1,7 @@
+#myStathalf ul{
+	list-style : none;
+}
+li.selected>a{
+	color : white;
+	background-color : #0088CC;
+}

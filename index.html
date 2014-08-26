@@ -1,0 +1,43 @@
+<html>
+<head>
+	<title>Bright Tree</title>
+
+	<link href="css/jquery.bright-tree.css" rel="stylesheet" type="text/css" />
+	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+	<script src="http://code.jquery.com/jquery-1.4.min.js"></script>
+	<script src="js/jquery.bright-tree.js"></script>
+	
+</head>
+<body>
+	<div id="myStathalf"></div>
+	<div class="tartine"></div>
+	<script>
+	var children = [];
+	children.push({ id : 12, labelOfPipo : "1111111111"});
+	children.push({ id : 15 ,labelOfPipo : "2222222222", before : "12"});
+	children.push({ id : 19 ,labelOfPipo : "4444444444"});
+	children.push({ id : 22 ,labelOfPipo : "**********", before : "19"});
+	children.push({ id : 33 ,labelOfPipo : "----------", before : "19"});
+	children.push({ id : 44 ,labelOfPipo : "9999999999", before : "33"});
+	$( document ).ready(function() {
+		    var tree = $('#myStathalf').brightTree(
+		    	{	"root-elements":[children[0],children[2]],
+		    		"tree-manager" : function(treeElement){
+		    			var toReturn = [];
+		    			for(var i in children){
+		    				if (children[i].before==treeElement.getData().id){
+		    					toReturn.push(children[i]);
+		    				}
+		    			}
+		    			return toReturn;
+		    		},
+		    		"label-manager" : function(element){
+		    			return element.getData().labelOfPipo+" id : "+element.getData().id+" parent : "+element.getData().before;
+		    		}
+		    });
+		});
+	</script>
+
+</body>
+</html>
