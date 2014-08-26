@@ -21,7 +21,7 @@
 	children.push({ id : 33 ,labelOfPipo : "----------", before : "19"});
 	children.push({ id : 44 ,labelOfPipo : "9999999999", before : "33"});
 	$( document ).ready(function() {
-		    var tree = $('#myStathalf').brightTree(
+		    $('#myStathalf').brightTree(
 		    	{	"root-elements":[children[0],children[2]],
 		    		"tree-manager" : function(treeElement){
 		    			var toReturn = [];
@@ -35,6 +35,9 @@
 		    		"label-manager" : function(element){
 		    			return element.getData().labelOfPipo+" id : "+element.getData().id+" parent : "+element.getData().before;
 		    		}
+		    });
+		    $('#myStathalf').data('bright-tree').getSelectManager().addElementSelectedListener(function(element){
+		    	console.log(element.getData());
 		    });
 		});
 	</script>

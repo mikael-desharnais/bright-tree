@@ -30,21 +30,32 @@
 		this.elementSelectedListener = [];
 		this.elementUnselectedListener = [];
 		this.select = function(element){
+			if (this.selectedElement==element){
+				return;
+			}
 			if (typeof this.selectedElement != "undefined"){
 				this.selectedElement.unselect();
+				this.propagateElementUnselected(this.selectedElement);
 			}
 			element.select();
 			this.selectedElement = element;
+			this.propagateElementSelected(element);
 		}
 		this.propagateElementSelected = function(element){
 			for(var i in this.elementSelectedListener){
-				this.elementSelectedListener[i]();
+				this.elementSelectedListener[i](element);
 			}
 		}
 		this.propagateElementUnselected = function(element){
 			for(var i in this.elementUnselectedListener){
-				this.elementUnselectedListener[i]();
+				this.elementUnselectedListener[i](element);
 			}
+		}
+		this.addElementSelectedListener = function(listener){
+			this.elementSelectedListener.push(listener);
+		}
+		this.addElementUnselectedListener = function(listener){
+			this.elementUnselectedListener.push(listener);
 		}
 	}
 	function BrightTreeElement(tree,data){
@@ -134,7 +145,10 @@
 				"root-elements" : []
 		    });
 		this.selectElement = function(element){
-			this.settings['select-manager'].select(element);
+			this.getSelectManager().select(element);
+		}
+		this.getSelectManager = function(){
+			return this.settings['select-manager'];
 		}
 		this.init = function(options){
 			this.settings = $.extend(defaultSettings);
