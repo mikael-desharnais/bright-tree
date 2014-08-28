@@ -92,13 +92,24 @@
 				this.close();
 			}
 		}
+		this.getStatus = function(){
+			return this.isOpen;
+		}
 		this.open = function(){
 			this.actionner.find('i').attr('class','icon-minus-sign');
-			this.childrenContainer.fadeIn(500);
+			if (this.getTree().isInFadeMode()){
+				this.childrenContainer.fadeIn(500);
+			}else {
+				this.childrenContainer.fadeIn(0);
+			}
 		}
 		this.close = function(){
 			this.actionner.find('i').attr('class','icon-plus-sign');
-			this.childrenContainer.fadeOut(500);
+			if (this.getTree().isInFadeMode()){
+				this.childrenContainer.fadeOut(500);
+			}else {
+				this.childrenContainer.fadeOut(0);
+			}
 		}
 		this.getHtmlElement = function(){
 			this.label.html(this.tree.settings['label-manager'](this));
@@ -154,7 +165,18 @@
 			}
 			this.redraw();
 		}
+		this.getOpenElementData = function(){
+			var toReturn = [];
+			this.walk(function(element){
+				if (element.getStatus()){
+					toReturn.push(element.getData());
+				}
+			});
+			return toReturn;
+		}
 		this.redraw = function(){
+			this.inFadeMode = false;
+			var openElements = this.getOpenElementData();
 			var rootHtmlElement = jQuery('<ul class="bright-tree"></ul>');
 			htmlContainer.empty();
 			this.children.length = 0;
@@ -170,6 +192,15 @@
 				}
 				this.children.push(treeElement);
 			}
+			this.walk(function(element){
+				if (openElements.indexOf(element.getData())>=0){
+					element.setStatus(true);
+				}
+			});
+			this.inFadeMode = true;
+		}
+		this.isInFadeMode = function(){
+			return this.inFadeMode;
 		}
 		this.createTreeElementFromData = function(data){
 			return new BrightTreeElement(this,data);
