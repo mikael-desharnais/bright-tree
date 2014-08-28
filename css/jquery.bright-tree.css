@@ -1,7 +1,24 @@
-#myStathalf ul{
+ul.bright-tree,ul.bright-tree ul{
 	list-style : none;
 }
-li.selected>a{
+ul.bright-tree li.selected>div>a.bright-tree-label{
 	color : white;
-	background-color : #0088CC;
+	background-color : #357EBD;
 }
+ul.bright-tree li.unselectable>div>a.bright-tree-label{
+	color : gray;
+	background-color : white;
+}
+ul.bright-tree li>div{
+	padding : 5px;
+}
+ul.bright-tree li>div>a.bright-tree-label{
+	padding : 5px;
+	padding-left : 10px;
+	padding-right : 10px;
+	margin-left : 5px;
+	border-radius : 4px;
+}
+ul.bright-tree li a{ 
+	outline: none;
+	text-decoration : none;}

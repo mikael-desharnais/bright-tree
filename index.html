@@ -21,7 +21,7 @@
 	children.push({ id : 33 ,labelOfPipo : "----------", before : "19"});
 	children.push({ id : 44 ,labelOfPipo : "9999999999", before : "33"});
 	$( document ).ready(function() {
-		    $('#myStathalf').brightTree(
+		    var tree = $('#myStathalf').brightTree(
 		    	{	"root-elements":[children[0],children[2]],
 		    		"tree-manager" : function(treeElement){
 		    			var toReturn = [];
@@ -33,12 +33,40 @@
 		    			return toReturn;
 		    		},
 		    		"label-manager" : function(element){
-		    			return element.getData().labelOfPipo+" id : "+element.getData().id+" parent : "+element.getData().before;
-		    		}
+		    			return element.getData().labelOfPipo;
+		    		},
+		    		"select-manager" : new jQuery.BrightTree.selectManagers.simple()
 		    });
+		    console.log(tree);
 		    $('#myStathalf').data('bright-tree').getSelectManager().addElementSelectedListener(function(element){
-		    	console.log(element.getData());
+		    	//console.log(element.getTree().getSelectManager().getSelectedElementList().length);
+		    	console.log(element.getTree().getSelectManager().getSelectedElement());
 		    });
+		    $('#myStathalf').data('bright-tree').getSelectManager().addElementUnselectedListener(function(element){
+		    	//console.log(element.getTree().getSelectManager().getSelectedElementList().length);
+		    	console.log(element.getTree().getSelectManager().getSelectedElement());
+		    });
+		    $('#myStathalf').data('bright-tree').walk(function(element){
+		    	//element.setSelectable(false);
+		    });
+		    setTimeout(function(){
+				$('#myStathalf').data('bright-tree').getRootElements().push(children[5]);
+				$('#myStathalf').data('bright-tree').redraw();
+			},2000);
+		    setTimeout(function(){
+				$('#myStathalf').data('bright-tree').walk(function(element){
+					element.setSelectable(element.getData().id%2==0);
+				});
+			},4000);
+		    setTimeout(function(){
+				$('#myStathalf').data('bright-tree').walk(function(element){
+					element.setSelectable(element.getData().id%2==1);
+					if (element.getData().id%2==1){
+						console.log('once',element.getData().id%2,element.getData().id);
+						element.getTree().selectElement(element);
+					}
+				});
+			},6000);
 		});
 	</script>
 
