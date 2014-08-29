@@ -11,6 +11,7 @@
 </head>
 <body>
 	<div id="myStathalf"></div>
+	<hr/>
 	<div id="myStathalf2"></div>
 	<div class="tartine"></div>
 	<script>
@@ -70,6 +71,7 @@
 				children[4].labelOfPipo +="-4-";
 				children[4].before = children[Math.round(Math.random()*3)].id;
 				$('#myStathalf').data('bright-tree').redraw();
+				$('#myStathalf2').data('bright-tree').redraw();
 			},2000);
 		    setTimeout(function(){
 				$('#myStathalf').data('bright-tree').walk(function(element){

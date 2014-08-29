@@ -215,7 +215,6 @@
 			}
 		}
 		this.createTreeElementFromData = function(data){
-			console.log(this.getRootElements().length,"mmmmm");
 			for(var i in this.elementInstanceList){
 				if (this.elementInstanceList[i].getData()==data){
 					return this.elementInstanceList[i];
