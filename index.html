@@ -7,7 +7,7 @@
 
 	<script src="http://code.jquery.com/jquery-1.4.min.js"></script>
 	<script src="js/jquery.bright-tree.js"></script>
-	
+
 </head>
 <body>
 	<div id="myStathalf"></div>
@@ -24,6 +24,7 @@
 		    var tree = $('#myStathalf').brightTree(
 		    	{	"root-elements":[children[0],children[2]],
 		    		"tree-manager" : function(treeElement){
+							console.log('tree-manager');
 		    			var toReturn = [];
 		    			for(var i in children){
 		    				if (children[i].before==treeElement.getData().id){
@@ -37,7 +38,6 @@
 		    		},
 		    		"select-manager" : new jQuery.BrightTree.selectManagers.simple()
 		    });
-		    console.log(tree);
 		    $('#myStathalf').data('bright-tree').getSelectManager().addElementSelectedListener(function(element){
 		    	//console.log(element.getTree().getSelectManager().getSelectedElementList().length);
 		    	console.log(element.getTree().getSelectManager().getSelectedElement());
@@ -49,8 +49,11 @@
 		    $('#myStathalf').data('bright-tree').walk(function(element){
 		    	//element.setSelectable(false);
 		    });
-		    setTimeout(function(){
-				$('#myStathalf').data('bright-tree').getRootElements().push(children[5]);
+		    setInterval(function(){
+				//$('#myStathalf').data('bright-tree').getRootElements().push(children[5]);
+				children[4].labelOfPipo +="-4-";
+				children[4].before = children[Math.round(Math.random()*3)].id;
+				console.log(children[Math.round(Math.random()*3)].id);
 				$('#myStathalf').data('bright-tree').redraw();
 			},2000);
 		    setTimeout(function(){
@@ -62,7 +65,6 @@
 				$('#myStathalf').data('bright-tree').walk(function(element){
 					element.setSelectable(element.getData().id%2==1);
 					if (element.getData().id%2==1){
-						console.log('once',element.getData().id%2,element.getData().id);
 						element.getTree().selectElement(element);
 					}
 				});

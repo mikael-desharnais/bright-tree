@@ -26,6 +26,7 @@
     };
 
 	function BrightTreeElement(tree,data){
+		BrightTreeElement.instanceList.push(this);
 		this.tree = tree;
 		this.htmlElement = jQuery('<li></li>');
 		this.labelContainer = jQuery('<div></div>');
@@ -37,16 +38,22 @@
 		this.isOpen = false;
 		this.isSelected = false;
 		this.isSelectable = true;
-		
+
 		this.htmlElement.append(this.labelContainer);
 		this.labelContainer.append(this.actionner);
 		this.labelContainer.append(this.label);
 		this.htmlElement.append(this.childrenContainer);
-		
+
 		var parent = this;
 		this.getTree = function(){
 			return this.tree;
 		};
+		this.initHTML = function(){
+			this.childrenContainer.children().detach();
+			for(var i in this.children){
+				this.childrenContainer.append(this.children[i].getHtmlElement());
+			}
+		}
 		this.actionner.click(function(event){
 			event.preventDefault();
 			parent.toogleStatus();
@@ -74,7 +81,7 @@
 			this.isSelected = false;
 			this.htmlElement.removeClass('selected');
 		}
-		
+
 		this.toogleStatus = function(){
 			this.setStatus(!this.isOpen);
 		}
@@ -97,19 +104,11 @@
 		}
 		this.open = function(){
 			this.actionner.find('i').attr('class','icon-minus-sign');
-			if (this.getTree().isInFadeMode()){
-				this.childrenContainer.fadeIn(500);
-			}else {
-				this.childrenContainer.fadeIn(0);
-			}
+			this.childrenContainer.fadeIn(this.getTree().isRedrawing()?0:500);
 		}
 		this.close = function(){
 			this.actionner.find('i').attr('class','icon-plus-sign');
-			if (this.getTree().isInFadeMode()){
-				this.childrenContainer.fadeOut(500);
-			}else {
-				this.childrenContainer.fadeOut(0);
-			}
+			this.childrenContainer.fadeOut(this.getTree().isRedrawing()?0:500);
 		}
 		this.getHtmlElement = function(){
 			this.label.html(this.tree.settings['label-manager'](this));
@@ -118,14 +117,16 @@
 		this.getData = function(){
 			return this.data;
 		}
+		this.reset = function(){
+			this.children.length = 0;
+		}
 		this.appendChild = function(child){
-			this.childrenContainer.append(child.getHtmlElement());
 			this.children.push(child);
 			var children = this.tree.settings['tree-manager'](child);
 			if (typeof children != "undefined" && children.length>0){
 				for(var i = 0; i < children.length;i++){
-					var childrenTreeElement = new BrightTreeElement(this.tree,children[i]);
-					child.appendChild(childrenTreeElement);
+					var childTreeElement = this.tree.createTreeElementFromData(children[i]);
+					child.appendChild(childTreeElement);
 				}
 			}
 			this.setStatus(this.isOpen);
@@ -137,6 +138,8 @@
 			}
 		};
 	}
+
+	BrightTreeElement.instanceList = [];
 	function BrightTree(htmlContainer){
 		var defaultSettings = $.extend($.fn.brightTree.settings,{
 				"tree-manager" : BrightTree.treeManagers.simple,
@@ -147,6 +150,7 @@
 				"root-elements" : []
 		    });
 		this.children = [];
+		this.isRedrawingB =false;
 		this.selectElement = function(element){
 			this.getSelectManager().select(element);
 		}
@@ -164,6 +168,14 @@
 				}
 			}
 			this.redraw();
+			this.walk(function(element){
+				if (element.getTree().settings['init-select-manager'](element)){
+					element.getTree().selectElement(element);
+				}
+				if (element.getTree().settings['init-status-manager'](element)){
+					element.setStatus(true);
+				}
+			})
 		}
 		this.getOpenElementData = function(){
 			var toReturn = [];
@@ -175,48 +187,52 @@
 			return toReturn;
 		}
 		this.redraw = function(){
-			this.inFadeMode = false;
+			this.isRedrawingB = true;
 			var openElements = this.getOpenElementData();
 			var rootHtmlElement = jQuery('<ul class="bright-tree"></ul>');
-			htmlContainer.empty();
+			htmlContainer.children().detach();
 			this.children.length = 0;
 			htmlContainer.append(rootHtmlElement);
 			for(var i in this.settings['root-elements']){
 				var treeElement = this.createTreeElementFromData(this.settings['root-elements'][i]);
-				if (this.settings['init-select-manager'](treeElement)){
-					this.selectElement(treeElement);
-				}
-				this.appendChild(rootHtmlElement,treeElement);
-				if (this.settings['init-status-manager'](treeElement)){
-					treeElement.setStatus(true);
-				}
+				treeElement.reset();
+				this.appendChild(treeElement);
 				this.children.push(treeElement);
 			}
-			this.walk(function(element){
-				if (openElements.indexOf(element.getData())>=0){
-					element.setStatus(true);
-				}
-			});
-			this.inFadeMode = true;
+			this.initHTML(rootHtmlElement);
+			this.isRedrawingB = false;
 		}
-		this.isInFadeMode = function(){
-			return this.inFadeMode;
+		this.isRedrawing = function(){
+			return this.isRedrawing;
+		}
+		this.initHTML = function(rootHtmlElement){
+			this.walk(function(element){
+				element.initHTML();
+			});
+			for(var i in this.children){
+				rootHtmlElement.append(this.children[i].getHtmlElement());
+			}
 		}
 		this.createTreeElementFromData = function(data){
+			for(var i in BrightTreeElement.instanceList){
+				if (BrightTreeElement.instanceList[i].getData()==data){
+					return BrightTreeElement.instanceList[i];
+				}
+			}
 			return new BrightTreeElement(this,data);
 		}
-		this.appendChild = function(container,treeElement){
-			container.append(treeElement.getHtmlElement());
+		this.appendChild = function(treeElement){
 			var children = this.settings['tree-manager'](treeElement);
 			if (typeof children != "undefined" && children.length>0){
 				for(var i = 0; i < children.length;i++){
-					var childrenTreeElement = this.createTreeElementFromData(children[i]);
-					if (this.settings['init-select-manager'](childrenTreeElement)){
-						this.selectElement(childrenTreeElement);
+					var childTreeElement = this.createTreeElementFromData(children[i]);
+					childTreeElement.reset();
+					if (this.settings['init-select-manager'](childTreeElement)){
+						this.selectElement(childTreeElement);
 					}
-					treeElement.appendChild(childrenTreeElement);
-					if (this.settings['init-status-manager'](childrenTreeElement)){
-						childrenTreeElement.setStatus(true);
+					treeElement.appendChild(childTreeElement);
+					if (this.settings['init-status-manager'](childTreeElement)){
+						childTreeElement.setStatus(true);
 					}
 				}
 			}
@@ -233,10 +249,10 @@
 	}
 	BrightTree.treeManagers = {
 		simple : function(element){
-			return element.getData().children;		
+			return element.getData().children;
 		}
 	};
-	
+
 	BrightTree.labelManagers = {
 		simple : function(element){
 			return element.getData().name;
@@ -330,6 +346,5 @@
 			}
 		}
 	};
-	
-}(jQuery));
 
+}(jQuery));
