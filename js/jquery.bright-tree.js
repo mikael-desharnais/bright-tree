@@ -30,7 +30,7 @@
 		this.tree = tree;
 		this.htmlElement = jQuery('<li></li>');
 		this.labelContainer = jQuery('<div></div>');
-		this.actionner = jQuery('<a href="#"><i class="icon-ok-sign"></i></a>');
+		this.actionner = jQuery('<a href="#"><i class="glyphicon glyphicon-ok-circle"></i></a>');
 		this.label = jQuery('<a href="#" class="bright-tree-label"></a>');
 		this.childrenContainer = jQuery('<ul style="display : none;"></ul>');
 		this.data = data;
@@ -103,11 +103,11 @@
 			return this.isOpen;
 		}
 		this.open = function(){
-			this.actionner.find('i').attr('class','icon-minus-sign');
+			this.actionner.find('i').attr('class','glyphicon glyphicon-minus-sign');
 			this.childrenContainer.fadeIn(this.getTree().isRedrawing()?0:500);
 		}
 		this.close = function(){
-			this.actionner.find('i').attr('class','icon-plus-sign');
+			this.actionner.find('i').attr('class','glyphicon glyphicon-plus-sign');
 			this.childrenContainer.fadeOut(this.getTree().isRedrawing()?0:500);
 		}
 		this.getHtmlElement = function(){
@@ -118,7 +118,7 @@
 			return this.data;
 		}
 		this.reset = function(){
-			this.actionner.find('i').attr('class','icon-ok-sign');
+			this.actionner.find('i').attr('class','glyphicon glyphicon-ok-circle');
 			this.children.length = 0;
 		}
 		this.appendChild = function(child){
@@ -132,12 +132,6 @@
 			}
 			this.setStatus(this.isOpen);
 		}
-		this.walk = function(walkFunction){
-			for(var i in this.children){
-				walkFunction(this.children[i]);
-				this.children[i].walk(walkFunction);
-			}
-		};
 	}
 
 	function BrightTree(htmlContainer){
@@ -228,13 +222,7 @@
 				for(var i = 0; i < children.length;i++){
 					var childTreeElement = this.createTreeElementFromData(children[i]);
 					childTreeElement.reset();
-					if (this.settings['init-select-manager'](childTreeElement)){
-						this.selectElement(childTreeElement);
-					}
 					treeElement.appendChild(childTreeElement);
-					if (this.settings['init-status-manager'](childTreeElement)){
-						childTreeElement.setStatus(true);
-					}
 				}
 			}
 		}
@@ -242,9 +230,8 @@
 			return htmlContainer;
 		};
 		this.walk = function(walkFunction){
-			for(var i in this.children){
-				walkFunction(this.children[i]);
-				this.children[i].walk(walkFunction);
+			for(var i in this.elementInstanceList){
+				walkFunction(this.elementInstanceList[i]);
 			}
 		};
 	}
@@ -280,9 +267,6 @@
 			this.elementSelectedListener = [];
 			this.elementUnselectedListener = [];
 			this.select = function(element){
-				if (this.selectedElement==element){
-					return;
-				}
 				if (typeof this.selectedElement != "undefined"){
 					this.selectedElement.unselect();
 					this.propagateElementUnselected(this.selectedElement);
