@@ -11,6 +11,7 @@
 </head>
 <body>
 	<div id="myStathalf"></div>
+	<div id="myStathalf2"></div>
 	<div class="tartine"></div>
 	<script>
 	var children = [];
@@ -22,22 +23,37 @@
 	children.push({ id : 44 ,labelOfPipo : "9999999999", before : "33"});
 	$( document ).ready(function() {
 		    var tree = $('#myStathalf').brightTree(
-		    	{	"root-elements":[children[0],children[2]],
-		    		"tree-manager" : function(treeElement){
-							console.log('tree-manager');
-		    			var toReturn = [];
-		    			for(var i in children){
-		    				if (children[i].before==treeElement.getData().id){
-		    					toReturn.push(children[i]);
-		    				}
-		    			}
-		    			return toReturn;
-		    		},
-		    		"label-manager" : function(element){
-		    			return element.getData().labelOfPipo;
-		    		},
-		    		"select-manager" : new jQuery.BrightTree.selectManagers.simple()
-		    });
+					{	"root-elements":[children[0],children[2]],
+						"tree-manager" : function(treeElement){
+							var toReturn = [];
+							for(var i in children){
+								if (children[i].before==treeElement.getData().id){
+									toReturn.push(children[i]);
+								}
+							}
+							return toReturn;
+						},
+						"label-manager" : function(element){
+							return element.getData().labelOfPipo;
+						},
+						"select-manager" : new jQuery.BrightTree.selectManagers.simple()
+				});
+				var tree2 = $('#myStathalf2').brightTree(
+					{	"root-elements":[children[0]],
+						"tree-manager" : function(treeElement){
+							var toReturn = [];
+							for(var i in children){
+								if (children[i].before==treeElement.getData().id){
+									toReturn.push(children[i]);
+								}
+							}
+							return toReturn;
+						},
+						"label-manager" : function(element){
+							return element.getData().labelOfPipo;
+						},
+						"select-manager" : new jQuery.BrightTree.selectManagers.simple()
+				});
 		    $('#myStathalf').data('bright-tree').getSelectManager().addElementSelectedListener(function(element){
 		    	//console.log(element.getTree().getSelectManager().getSelectedElementList().length);
 		    	console.log(element.getTree().getSelectManager().getSelectedElement());
@@ -53,7 +69,6 @@
 				//$('#myStathalf').data('bright-tree').getRootElements().push(children[5]);
 				children[4].labelOfPipo +="-4-";
 				children[4].before = children[Math.round(Math.random()*3)].id;
-				console.log(children[Math.round(Math.random()*3)].id);
 				$('#myStathalf').data('bright-tree').redraw();
 			},2000);
 		    setTimeout(function(){

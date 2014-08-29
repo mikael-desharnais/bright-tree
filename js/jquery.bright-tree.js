@@ -26,7 +26,7 @@
     };
 
 	function BrightTreeElement(tree,data){
-		BrightTreeElement.instanceList.push(this);
+		tree.elementInstanceList.push(this);
 		this.tree = tree;
 		this.htmlElement = jQuery('<li></li>');
 		this.labelContainer = jQuery('<div></div>');
@@ -118,6 +118,7 @@
 			return this.data;
 		}
 		this.reset = function(){
+			this.actionner.find('i').attr('class','icon-ok-sign');
 			this.children.length = 0;
 		}
 		this.appendChild = function(child){
@@ -139,16 +140,16 @@
 		};
 	}
 
-	BrightTreeElement.instanceList = [];
 	function BrightTree(htmlContainer){
-		var defaultSettings = $.extend($.fn.brightTree.settings,{
+		var defaultSettings = jQuery.extend(jQuery.extend({},$.fn.brightTree.settings),{
 				"tree-manager" : BrightTree.treeManagers.simple,
 				"label-manager" : BrightTree.labelManagers.simple,
 				"select-manager" : new BrightTree.selectManagers.simple(),
 				"init-select-manager" : BrightTree.initSelectManagers.none,
 				"init-status-manager" : BrightTree.initStatusManagers.allClosed,
 				"root-elements" : []
-		    });
+			});
+		this.elementInstanceList =[];
 		this.children = [];
 		this.isRedrawingB =false;
 		this.selectElement = function(element){
@@ -161,7 +162,7 @@
 			return this.settings['root-elements'];
 		}
 		this.init = function(options){
-			this.settings = $.extend(defaultSettings);
+			this.settings = $.extend({},defaultSettings);
 			for(var i in options){
 				if (typeof this.settings[i] != "undefined"){
 					this.settings[i] = options[i];
@@ -214,9 +215,10 @@
 			}
 		}
 		this.createTreeElementFromData = function(data){
-			for(var i in BrightTreeElement.instanceList){
-				if (BrightTreeElement.instanceList[i].getData()==data){
-					return BrightTreeElement.instanceList[i];
+			console.log(this.getRootElements().length,"mmmmm");
+			for(var i in this.elementInstanceList){
+				if (this.elementInstanceList[i].getData()==data){
+					return this.elementInstanceList[i];
 				}
 			}
 			return new BrightTreeElement(this,data);
